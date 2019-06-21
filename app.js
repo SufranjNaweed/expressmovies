@@ -1,7 +1,21 @@
 const express =  require('express');
+const bodyParser = require('body-parser');
+const multer = require('multer');
 const app =  express();
 const port = 3000;
 
+const upload = multer();
+
+
+////////////////////////////
+///     DATA
+////////////////////////////
+let frenchMovies  = [
+    {title :  'le fabuleux destin d\'Amelie Poulin',  year : 2001 },
+    {title : 'Buffet froid ', year :  1979 },
+    {title : 'Le diner des cons', year: 1998 },
+    {title : 'De rouille et d\'os', year:  2012}
+];
 
 /////////////////////////
 /// set path to views
@@ -15,23 +29,18 @@ app.set('view engine', 'ejs');
 /////////////////////////////////
 app.use('/public', express.static('public'));
 
-
 //////////////////////
 //     ROUTES
 //////////////////////
 
+//////////
+// GET
+/////////
 app.get('/', (req, res) => {
     res.render('index');
 });
 app.get('/movies', (req, res) => {
-
     const title = 'Film français des 30 dernière années';
-    const frenchMovies  = [
-        {title :  'le fabuleux destin d\'Amelie Poulin',  year : 2001 },
-        {title : 'Buffet froid ', year :  1979 },
-        {title : 'Le diner des cons', year: 1998 },
-        {title : 'De rouille et d\'os', year:  2012}
-    ];
     res.render('movies', { movies :  frenchMovies, title: title });
 });
 app.get('/movie-details', (req, res) =>{
@@ -42,14 +51,41 @@ app.get('/movies/add', (req, res) => {
 });
 app.get('/movies/:id', (req, res) =>{
     const  id =  req.params.id;
-
     res.render('movie-details', {movieId :  id});
 });
 
+//////////
+// POST
+/////////
 
-app.post('/movies', (req, res) => {
-    console.log(req.body);
+/*
+let urlencodedParser = bodyParser.urlencoded({extended: false});
+app.post('/movies', urlencodedParser,(req, res) => {
+    const newMovie = { title: req.body.movietitle, year: req.body.movieyear};
+    frenchMovies   = [...frenchMovies, newMovie];
+
+    console.log(frenchMovies);
+    res.sendStatus(201);
 });
+*/
+
+app.post('/movies', upload.fields([]), (req, res) => {
+    if(!req.body){
+        return res.sendStatus(500);
+    }
+    else {
+        const formData =  req.body;
+        console.log('formData :  ', formData);
+        const newMovie = { title: req.body.movietitle, year: req.body.movieyear};
+        frenchMovies   = [...frenchMovies, newMovie];
+
+        res.sendStatus(201);
+
+    }
+});
+
+
+
 ///////////////////////////////////////
 ///     Listen Port a mettre
 //      à la fin du point d'entrée

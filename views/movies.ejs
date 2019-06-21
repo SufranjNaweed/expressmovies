@@ -6,7 +6,7 @@
             vous trouverez ici une séléction de film incroyable
         </p>
 
-        <div>
+        <div class="movies">
             <% for(movie of movies) { %>
                 <div>
                     <h3><%= movie.title %> (<%=  movie.year %>)</h3>
@@ -29,5 +29,43 @@
             </form>
         </div>
     </div>
+
+    <script>
+
+
+        let checkStatus = (response) => {
+            if(response.status >= 200 && response.status < 300){
+                let newMovieDiv  = document.createElement('div');
+                const movietitle = document.getElementById('movietitle').value;
+                const movieyear  = document.getElementById('movieyear').value;
+
+
+                if (movietitle !=  0 && movieyear != 0){
+                    newMovieDiv.innerHTML = `<h3>${movietitle} (${movieyear})</h3>`;
+                    document.querySelector('.movies').appendChild(newMovieDiv);
+                    form.reset();
+                }
+
+            }
+        }
+        let addMovie = (event) => {
+            // stop le rechargement
+            event.preventDefault();
+
+            if(fetch){
+                fetch('/movies', {
+                    method: 'POST',
+                    body: new FormData(form)
+                })
+                    .then(checkStatus)
+                    .catch((error) => {
+                        console.error('request failed : ',  error);
+                    });
+            }
+        }
+
+        const form = document.querySelector('form');
+        form.addEventListener("submit", addMovie);
+    </script>
 
 <% include ./partials/footer %>
