@@ -1,0 +1,33 @@
+<% include ./partials/head %>
+
+    <h1>Express Movies: <%=  title %> </h1>
+    <div class="container">
+        <p>
+            vous trouverez ici une séléction de film incroyable
+        </p>
+
+        <div>
+            <% for(movie of movies) { %>
+                <div>
+                    <h3><%= movie.title %> (<%=  movie.year %>)</h3>
+                </div>
+            <% } %>
+        </div>
+
+
+        <div class="">
+            <form action="/movies" method="post">
+                <p>
+                    <label for="movietitle">Titre du Film</label>
+                    <input id="movietitle" type="text" name="movietitle">
+                </p>
+                <p>
+                    <label for="movieyear">Année de sortie</label>
+                    <input id="movieyear" type="text" name="movieyear">
+                </p>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>
+    </div>
+
+<% include ./partials/footer %>
