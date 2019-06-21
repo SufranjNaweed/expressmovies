@@ -1,0 +1,20 @@
+a{
+    text-decoration: none;
+}
+
+.central {
+    min-height: 250px;
+}
+
+.container{
+    min-height: 200px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media screen and (min-width: 1300px){
+    .container{
+        max-width: 1180px;
+    }
+}
