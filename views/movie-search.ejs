@@ -23,13 +23,23 @@
 
         btnSearch.addEventListener('click', search);
 
-    
         function search(){
             const query = `${API_URL}${API_KEY}&query=${term.value}`;
-            console.log(query)
             axios.get(query)
-            .then((res)=>{console.log(res)})
+            .then((res)=>{
+                console.log(res)
+                displayResults(res.data.results);
+            })
             .catch((error)=>{console.log(error)})
+        }
+
+        function displayResults(results){
+            resultsDiv.innerHTML = '';
+            for(let result of results){
+                let movieDiv =  document.createElement('div');
+                movieDiv.innerHTML = result.title;
+                resultsDiv.appendChild(movieDiv);
+            }
         }
 
     </script>
