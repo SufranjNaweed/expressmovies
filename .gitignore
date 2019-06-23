@@ -5,6 +5,7 @@ npm-debug.log*
 
 package-lock.json
 .idea
+.env
 
 # Runtime data
 pids
