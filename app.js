@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const app =  express();
 const port = 3000;
+const axios = require('axios');
+const dotenv = require('dotenv').config();
 
 const upload = multer();
 
@@ -10,7 +12,7 @@ const upload = multer();
 ////////////////////////////
 ///     DATA
 ////////////////////////////
-let frenchMovies  = [
+let moviesList  = [
     {title :  'le fabuleux destin d\'Amelie Poulin',  year : 2001 },
     {title : 'Buffet froid ', year :  1979 },
     {title : 'Le diner des cons', year: 1998 },
@@ -41,8 +43,14 @@ app.get('/', (req, res) => {
 });
 app.get('/movies', (req, res) => {
     const title = 'Film français des 30 dernière années';
-    res.render('movies', { movies :  frenchMovies, title: title });
+    res.render('movies', { movies :  moviesList, title: title });
 });
+
+app.get('/movie-search', (req, res) => {
+    const title =  'Rechercher un film';
+    res.render('movie-search', {title : title, api_key: dotenv.parsed.API_KEY, api_url: dotenv.parsed.API_URL});
+});
+
 app.get('/movie-details', (req, res) =>{
     res.render('movie-details');
 });
@@ -58,17 +66,6 @@ app.get('/movies/:id', (req, res) =>{
 // POST
 /////////
 
-/*
-let urlencodedParser = bodyParser.urlencoded({extended: false});
-app.post('/movies', urlencodedParser,(req, res) => {
-    const newMovie = { title: req.body.movietitle, year: req.body.movieyear};
-    frenchMovies   = [...frenchMovies, newMovie];
-
-    console.log(frenchMovies);
-    res.sendStatus(201);
-});
-*/
-
 app.post('/movies', upload.fields([]), (req, res) => {
     if(!req.body){
         return res.sendStatus(500);
@@ -77,10 +74,9 @@ app.post('/movies', upload.fields([]), (req, res) => {
         const formData =  req.body;
         console.log('formData :  ', formData);
         const newMovie = { title: req.body.movietitle, year: req.body.movieyear};
-        frenchMovies   = [...frenchMovies, newMovie];
+        moviesList   = [...moviesList, newMovie];
 
         res.sendStatus(201);
-
     }
 });
 

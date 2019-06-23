@@ -1,0 +1,36 @@
+<% include  ./partials/head %>
+    <pre id="data" style="display:none;" data-apikey="<%= api_key %>" data-apiurl=<%= api_url %>></pre>
+    <h1><%= title %> sur Movie DataBase</h1>
+    <div>
+        <input type="text" name="term" id="term" placeholder="titre de film">
+        <button id="btnSearch">Search</button>
+
+
+        <div id="results" class="results">
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        const data = document.querySelector('#data'); 
+        const API_KEY =  data.dataset.apikey;
+        const API_URL =  data.dataset.apiurl;
+
+        const term = document.querySelector('#term');
+        const btnSearch = document.querySelector('#btnSearch');
+        let resultsDiv =  document.querySelector('#results');
+
+        btnSearch.addEventListener('click', search);
+
+    
+        function search(){
+            const query = `${API_URL}${API_KEY}&query=${term.value}`;
+            console.log(query)
+            axios.get(query)
+            .then((res)=>{console.log(res)})
+            .catch((error)=>{console.log(error)})
+        }
+
+    </script>
+<% include  ./partials/footer %>
