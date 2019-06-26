@@ -6,8 +6,11 @@ const port = 3000;
 const axios = require('axios');
 const dotenv = require('dotenv').config();
 
+const jwt = require('jsonwebtoken');
+
 const upload = multer();
 
+let urlencodedParser =  bodyParser.urlencoded({extended: false});
 
 ////////////////////////////
 ///     DATA
@@ -18,6 +21,9 @@ let moviesList  = [
     {title : 'Le diner des cons', year: 1998 },
     {title : 'De rouille et d\'os', year:  2012}
 ];
+
+
+const fakeUser = { email: 'toto@gmail.com', password: 'tata'};
 
 /////////////////////////
 /// set path to views
@@ -41,6 +47,11 @@ app.use('/public', express.static('public'));
 app.get('/', (req, res) => {
     res.render('index');
 });
+
+app.get('/login', (req, res) =>{
+    const title = 'Espace membre';
+    res.render('login', {title: title});
+})
 app.get('/movies', (req, res) => {
     const title = 'Film français des 30 dernière années';
     res.render('movies', { movies :  moviesList, title: title });
@@ -62,9 +73,25 @@ app.get('/movies/:id', (req, res) =>{
     res.render('movie-details', {movieId :  id});
 });
 
-//////////
+////////////////
 // POST
-/////////
+///////////////
+
+app.post('/login', urlencodedParser, (req, res) => {
+    if(!req.body){
+        res.sendStatus(500);
+    }
+    else{
+        if (fakeUser.email === req.body.email &&  fakeUser.password === req.body.password) {
+            console.log("recognized user");
+            const myToken =  jwt.sign({iss: 'http://expressmovies.com', user:'Sam', role: 'moderator'}, dotenv.parsed.API_KEY);
+            res.json(myToken);
+        }
+        else{
+            res.sendStatus(403);
+        }
+    }
+});
 
 app.post('/movies', upload.fields([]), (req, res) => {
     if(!req.body){
