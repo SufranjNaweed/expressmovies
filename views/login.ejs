@@ -17,24 +17,119 @@
 
 		<div id="profile" style="display: none;">
 			<button id="disconnectBtn">Déconnexion</button>
+			<button id="displayPayload">display payload</button>
+			<div id="decodedPayload">
+
+			</div>
+			<div>
+				<a href="#" id="member-only">espace membre</a>
+			</div>
 		</div>
 
 		<script>
+			///////////////////////////////
+			//		variable			///
+			//////////////////////////////
 			var form = document.querySelector('form');
-			form.addEventListener("submit", loginUser);	
-
 			var loginArea = document.querySelector('#login');
 			var profileArea = document.querySelector('#profile');
+			var displayPayloadBtn = document.querySelector('#displayPayload');
+
 			var disconnectBtn = document.querySelector('#disconnectBtn');
+			var connectionLinkArea = document.querySelector('#connectionLink');
 
-			disconnectBtn.addEventListener('click', function(){
-				disconnect();
-			});
+			var memberOnlyLink = document.querySelector('#member-only');
+			
+			handleFormDisplay();
 
+			///////////////////////////////
+			//		FUNCTION			///
+			//////////////////////////////
 			function loginUser(event) {				
 				loginUserWithXHR(event);
 			}
 			
+			function switchToLoggedMode(){
+				loginArea.style.display =  'none';
+				profileArea.style.display = 'block';
+				connectionLinkArea.innerHTML = '<a href="/login">deconnection</a>';
+			}
+
+			function switchToLoggedOutMode(){
+				loginArea.style.display =  'block';
+				profileArea.style.display = 'none';
+				connectionLinkArea.innerHTML = '<a href="/login">connexion</a>';
+			}
+
+			function disconnect(){
+				switchToLoggedOutMode();
+				localStorage.removeItem('token');
+			}
+
+			function handleFormDisplay(){
+				if (localStorage.getItem('token')){
+					switchToLoggedMode();
+				}else{
+					switchToLoggedOutMode();
+				}
+			}
+
+			function displayPayload(){
+				var payload =  parseJwt();
+				var decodedPayloadDiv = document.querySelector('#decodedPayload');
+				decodedPayloadDiv.innerHTML = '<pre>' +  JSON.stringify(payload) +  '</pre>';
+			}
+
+			function parseJwt(){
+				var tokenFromStorage = localStorage.getItem('token');
+				if(tokenFromStorage){
+					var base64Payload = tokenFromStorage.split('.')[1];
+					return JSON.parse(window.atob(base64Payload));
+				}
+				else{
+					return 'no token to parse';
+				}
+			}
+
+			function makeRequestWithToken(event){
+				event.preventDefault();
+				var page =  this.id;
+				var tokenFromStorage = localStorage.getItem('token');
+				var config = {};
+
+
+				if (tokenFromStorage){
+					config.headers = {
+						'Authorization' :  'Bearer ' + JSON.parse(tokenFromStorage)
+					}
+					console.log(config);
+				}
+
+				axios.get(
+					'http://localhost:3000/' + page,
+					config
+				)
+				.then(res =>{
+					console.log("success");
+					console.log(res);
+				})
+				.catch(error => {
+					console.log('makeRequestWithToken err : ' + error);
+				})
+
+			}
+
+			////////////////////////////
+			///		Action 			///
+			///////////////////////////
+			form.addEventListener("submit", loginUser);	
+			disconnectBtn.addEventListener('click', disconnect);
+			displayPayloadBtn.addEventListener('click', displayPayload);
+			memberOnlyLink.addEventListener('click', makeRequestWithToken);
+
+			//////////////////
+			///	 AJAX	  ///
+			/////////////////
 			function loginUserWithXHR(event) {		
 				event.preventDefault();
 				console.log('loginUserWithXHR');		
@@ -61,21 +156,5 @@
 				var payLoad = "email=" + email + "&" + "password=" + password; 
 				xhr.send(payLoad);
 			}
-
-			function switchToLoggedMode(){
-				loginArea.style.display =  'none';
-				profileArea.style.display = 'block';
-			}
-
-			function switchToLoggedOutMode(){
-				loginArea.style.display =  'block';
-				profileArea.style.display = 'none';
-			}
-
-			function disconnect(){
-				switchToLoggedOutMode();
-				localStorage.removeItem('token');
-			}
 		</script>
-
     <% include ./partials/footer %>
