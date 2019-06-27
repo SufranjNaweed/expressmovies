@@ -7,6 +7,7 @@ const axios = require('axios');
 const dotenv = require('dotenv').config();
 
 const jwt = require('jsonwebtoken');
+const expressJwt = require('express-jwt');
 
 const upload = multer();
 
@@ -24,6 +25,8 @@ let moviesList  = [
 
 
 const fakeUser = { email: 'toto@gmail.com', password: 'tata'};
+const secret =  "qsdjS12ozehdoIJ123DJOZJLDSCqsdeffdg123ER56SDFZedhWXojqshduzaohduihqsDAqsdq";
+
 
 /////////////////////////
 /// set path to views
@@ -37,15 +40,23 @@ app.set('view engine', 'ejs');
 /////////////////////////////////
 app.use('/public', express.static('public'));
 
+app.use(expressJwt({secret :  secret}).unless({path : ['/', '/movies', '/movie-search','/login']}));
+
 //////////////////////
 //     ROUTES
 //////////////////////
 
+///////////
+// GET  //
 //////////
-// GET
-/////////
+
 app.get('/', (req, res) => {
     res.render('index');
+});
+
+app.get('/member-only', (req, res) => {
+    console.log('req.user', req.user);
+    res.send(req.user);
 });
 
 app.get('/login', (req, res) =>{
@@ -84,7 +95,8 @@ app.post('/login', urlencodedParser, (req, res) => {
     else{
         if (fakeUser.email === req.body.email &&  fakeUser.password === req.body.password) {
             console.log("recognized user");
-            const myToken =  jwt.sign({iss: 'http://expressmovies.com', user:'Sam', role: 'moderator'}, dotenv.parsed.API_KEY);
+            const myToken =  jwt.sign({iss: 'http://expressmovies.com', user:'Sam', role: 'moderator'}, secret);
+            console.log(myToken);
             res.json(myToken);
         }
         else{
