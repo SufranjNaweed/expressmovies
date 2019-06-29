@@ -35,9 +35,9 @@ app.set('views', './views');
 app.set('view engine', 'ejs');
 
 
-//////////////////////////////////
+////////////////////////////////////
 // gestion du repertoire public
-/////////////////////////////////
+///////////////////////////////////
 app.use('/public', express.static('public'));
 
 app.use(expressJwt({secret :  secret}).unless({path : ['/', '/movies', '/movie-search','/login']}));
@@ -62,7 +62,8 @@ app.get('/member-only', (req, res) => {
 app.get('/login', (req, res) =>{
     const title = 'Espace membre';
     res.render('login', {title: title});
-})
+});
+
 app.get('/movies', (req, res) => {
     const title = 'Film français des 30 dernière années';
     res.render('movies', { movies :  moviesList, title: title });
@@ -76,9 +77,11 @@ app.get('/movie-search', (req, res) => {
 app.get('/movie-details', (req, res) =>{
     res.render('movie-details');
 });
+
 app.get('/movies/add', (req, res) => {
     res.send('prochainement, un formulaire d\'ajout ici');
 });
+
 app.get('/movies/:id', (req, res) =>{
     const  id =  req.params.id;
     res.render('movie-details', {movieId :  id});
