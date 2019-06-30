@@ -2,26 +2,62 @@ const express =  require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const app =  express();
-const port = 3000;
+const port = 9000;
 const axios = require('axios');
 const dotenv = require('dotenv').config();
-
-const jwt = require('jsonwebtoken');
-const expressJwt = require('express-jwt');
 
 const upload = multer();
 
 let urlencodedParser =  bodyParser.urlencoded({extended: false});
 
+const jwt = require('jsonwebtoken');
+const expressJwt = require('express-jwt');
+
+const faker =  require('faker');
+
+
+//////////////////////////////////
+///         MONGODB
+//////////////////////////////////
+const mongoose = require('mongoose');
+mongoose.connect("mongodb+srv://"+ dotenv.parsed.MONGODB_CONNECT +"/expressmovie?retryWrites=true&w=majority", {useNewUrlParser: true});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error : cannot connect to my DB'));
+db.once('open', ()=>{
+    console.log('connected to the db :) ');
+});
+
+const movieSchema = mongoose.Schema({
+    movietitle: String,
+    movieyear: Number,
+    moviedescription:  String,
+});
+
+const Movie = mongoose.model('movies', movieSchema);
+const title = faker.lorem.sentence(3);
+const year  = Math.floor(Math.random() *70) + 1950;
+
+const myMovie = new Movie({
+    movietitle: title,
+    movieyear: year
+});
+
+/*
+myMovie.save((err, savedMovie) => {
+    if(err){
+        console.error(err); 
+    }
+    else{
+        console.log('savedMovie', savedMovie);
+    }
+}); 
+*/
+
+
 ////////////////////////////
 ///     DATA
 ////////////////////////////
-let moviesList  = [
-    {title :  'le fabuleux destin d\'Amelie Poulin',  year : 2001 },
-    {title : 'Buffet froid ', year :  1979 },
-    {title : 'Le diner des cons', year: 1998 },
-    {title : 'De rouille et d\'os', year:  2012}
-];
+let moviesList  = [];
 
 
 const fakeUser = { email: 'toto@gmail.com', password: 'tata'};
@@ -66,7 +102,18 @@ app.get('/login', (req, res) =>{
 
 app.get('/movies', (req, res) => {
     const title = 'Film français des 30 dernière années';
-    res.render('movies', { movies :  moviesList, title: title });
+    moviesList = [];
+    ////  GET DATA FROM MONGODB
+    Movie.find((err, movies)=> {
+        if (err){
+            console.error(err);
+        }
+        else{
+            console.log(movies);
+            moviesList =  movies;
+            res.render('movies', { movies :  moviesList, title: title });
+        }
+    });
 });
 
 app.get('/movie-search', (req, res) => {
@@ -115,10 +162,27 @@ app.post('/movies', upload.fields([]), (req, res) => {
     else {
         const formData =  req.body;
         console.log('formData :  ', formData);
-        const newMovie = { title: req.body.movietitle, year: req.body.movieyear};
-        moviesList   = [...moviesList, newMovie];
+        const title = req.body.movietitle;
+        const year  = req.body.movieyear;
 
-        res.sendStatus(201);
+
+        /// SEND DATA TO MONGODB
+        const newMovie = { title: title, year: year};
+        moviesList   = [...moviesList, newMovie];
+        
+        const myMovie = new Movie({
+            movietitle  : title,
+            movieyear   : year
+        });
+        myMovie.save((err, savedMovie) => {
+            if (err){
+                console.log(err);
+            }
+            else{
+                console.log(savedMovie);
+                res.sendStatus(200);
+            }
+        });
     }
 });
 
