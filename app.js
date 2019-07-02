@@ -64,7 +64,7 @@ app.set('view engine', 'ejs');
 ///////////////////////////////////
 app.use('/public', express.static('public'));
 
-app.use(expressJwt({secret :  secret}).unless({path : ['/', '/movies', '/movie-search','/login', new RegExp('/movies.*/', 'i')]}));
+// app.use(expressJwt({secret :  secret}).unless({path : ['/', '/movies', '/movie-search','/login', new RegExp('/movies.*/', 'i')]}));
 
 //////////////////////
 //     ROUTES
@@ -179,13 +179,15 @@ app.post('/movies', upload.fields([]), (req, res) => {
 // Put
 ///////////////
 /// 5d18d7daa2c1311e7451989d
+
 app.put('/movies/:id', urlencodedParser, (req, res) => {
     if (!req.body){
         return (res.sendStatus(500));
     }
+    console.log(req.body)
     console.log('movietitle' ,  req.body.movietitle, 'movieyear : ' , req.body.movieyear);
     const id = req.params.id;
-    /*
+
     Movie.findByIdAndUpdate(id, {$set: { movietitle : req.body.movietitle, movieyear: req.body.movieyear}},
         {new : true}, 
         (err, movie) => {
@@ -194,10 +196,22 @@ app.put('/movies/:id', urlencodedParser, (req, res) => {
                 res.send('le film n\'a pas pu etre mis à jours');
             }
         });
-        */
-       res.send('Put : ' + req.body);
+     
+       //res.send('Put : ' + req.body);
 });
 
+/*
+app.put('/movies/:id', (req, res)=>{
+    console.log(req.params.id);
+    console.log(req.body);
+    if (!req.body){
+        res.send('cest vide ');
+    }
+    else{
+        res.send(req.body.movietitle);
+    }
+})
+*/
 ///////////////////////////////////////
 ///     Listen Port a mettre
 //      à la fin du point d'entrée
