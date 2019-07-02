@@ -44,27 +44,14 @@ const myMovie = new Movie({
     movieyear: year
 });
 
-/*
-myMovie.save((err, savedMovie) => {
-    if(err){
-        console.error(err); 
-    }
-    else{
-        console.log('savedMovie', savedMovie);
-    }
-}); 
-*/
-
 
 ////////////////////////////
 ///     DATA
 ////////////////////////////
 let moviesList  = [];
 
-
 const fakeUser = { email: 'toto@gmail.com', password: 'tata'};
 const secret =  "qsdjS12ozehdoIJ123DJOZJLDSCqsdeffdg123ER56SDFZedhWXojqshduzaohduihqsDAqsdq";
-
 
 /////////////////////////
 /// set path to views
@@ -72,13 +59,12 @@ const secret =  "qsdjS12ozehdoIJ123DJOZJLDSCqsdeffdg123ER56SDFZedhWXojqshduzaohd
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
-
 ////////////////////////////////////
 // gestion du repertoire public
 ///////////////////////////////////
 app.use('/public', express.static('public'));
 
-app.use(expressJwt({secret :  secret}).unless({path : ['/', '/movies', '/movie-search','/login']}));
+app.use(expressJwt({secret :  secret}).unless({path : ['/', '/movies', '/movie-search','/login', new RegExp('/movies.*/', 'i')]}));
 
 //////////////////////
 //     ROUTES
@@ -189,6 +175,28 @@ app.post('/movies', upload.fields([]), (req, res) => {
 });
 
 
+////////////////
+// Put
+///////////////
+/// 5d18d7daa2c1311e7451989d
+app.put('/movies/:id', urlencodedParser, (req, res) => {
+    if (!req.body){
+        return (res.sendStatus(500));
+    }
+    console.log('movietitle' ,  req.body.movietitle, 'movieyear : ' , req.body.movieyear);
+    const id = req.params.id;
+    /*
+    Movie.findByIdAndUpdate(id, {$set: { movietitle : req.body.movietitle, movieyear: req.body.movieyear}},
+        {new : true}, 
+        (err, movie) => {
+            if (err){
+                console.error(err);
+                res.send('le film n\'a pas pu etre mis à jours');
+            }
+        });
+        */
+       res.send('Put : ' + req.body);
+});
 
 ///////////////////////////////////////
 ///     Listen Port a mettre
