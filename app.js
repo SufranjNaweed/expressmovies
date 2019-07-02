@@ -5,6 +5,7 @@ const app =  express();
 const port = 9000;
 const axios = require('axios');
 const dotenv = require('dotenv').config();
+const config = require('./config');
 
 const upload = multer();
 
@@ -20,7 +21,8 @@ const faker =  require('faker');
 ///         MONGODB
 //////////////////////////////////
 const mongoose = require('mongoose');
-mongoose.connect("mongodb+srv://"+ dotenv.parsed.MONGODB_CONNECT +"/expressmovie?retryWrites=true&w=majority", {useNewUrlParser: true});
+mongoose.connect(`mongodb+srv://${config.db.user}:${config.db.password}${dotenv.parsed.MONGODB_CONNECT}/expressmovie?retryWrites=true&w=majority`, {useNewUrlParser: true});
+
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error : cannot connect to my DB'));
 db.once('open', ()=>{
