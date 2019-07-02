@@ -197,21 +197,9 @@ app.put('/movies/:id', urlencodedParser, (req, res) => {
             }
         });
      
-       //res.send('Put : ' + req.body);
+       res.send('Put : ' +  id);
 });
 
-/*
-app.put('/movies/:id', (req, res)=>{
-    console.log(req.params.id);
-    console.log(req.body);
-    if (!req.body){
-        res.send('cest vide ');
-    }
-    else{
-        res.send(req.body.movietitle);
-    }
-})
-*/
 ///////////////////////////////////////
 ///     Listen Port a mettre
 //      à la fin du point d'entrée
