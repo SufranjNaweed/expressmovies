@@ -64,7 +64,7 @@ app.set('view engine', 'ejs');
 ///////////////////////////////////
 app.use('/public', express.static('public'));
 
-// app.use(expressJwt({secret :  secret}).unless({path : ['/', '/movies', '/movie-search','/login', new RegExp('/movies.*/', 'i')]}));
+// app.use(expressJwt({secret :  secret}).unless({path : ['/', '/movies', '/movie-search','/login', new RegExp('/movies.*/', 'i'), new RegExp('/movie-details.*/', 'i')]}));
 
 //////////////////////
 //     ROUTES
@@ -109,8 +109,22 @@ app.get('/movie-search', (req, res) => {
     res.render('movie-search', {title : title, api_key: dotenv.parsed.API_KEY, api_url: dotenv.parsed.API_URL});
 });
 
-app.get('/movie-details', (req, res) =>{
-    res.render('movie-details');
+app.get('/movie-details/:id', (req, res) =>{
+    const id = req.params.id; 
+    console.log(id);
+    Movie.findById(id, (error, movie)=> {
+        console.log("movie : " + movie);
+        if(error){
+            console.error(error);
+        }
+        else if(movie){
+            console.log('movie', movie);
+            res.render('movie-details', { movie :  movie });
+        }
+        else{
+            res.render('movie-details');
+        }
+    });
 });
 
 app.get('/movies/add', (req, res) => {
@@ -125,7 +139,7 @@ app.get('/movies/:id', (req, res) =>{
 ////////////////
 // POST
 ///////////////
-
+/// 5d18d7daa2c1311e7451989d
 app.post('/login', urlencodedParser, (req, res) => {
     if(!req.body){
         res.sendStatus(500);
@@ -174,31 +188,34 @@ app.post('/movies', upload.fields([]), (req, res) => {
     }
 });
 
-
-////////////////
-// Put
-///////////////
-/// 5d18d7daa2c1311e7451989d
-
-app.put('/movies/:id', urlencodedParser, (req, res) => {
+app.post('/movie-details/:id', urlencodedParser, (req, res) => {
     if (!req.body){
         return (res.sendStatus(500));
     }
-    console.log(req.body)
-    console.log('movietitle' ,  req.body.movietitle, 'movieyear : ' , req.body.movieyear);
     const id = req.params.id;
 
     Movie.findByIdAndUpdate(id, {$set: { movietitle : req.body.movietitle, movieyear: req.body.movieyear}},
         {new : true}, 
         (err, movie) => {
+            console.log(movie);
             if (err){
                 console.error(err);
                 res.send('le film n\'a pas pu etre mis à jours');
             }
         });
-     
-       res.send('Put : ' +  id);
+        res.redirect('/movies');
 });
+
+/////////////////////
+/// DELETE
+/////////////////////
+app.delete('/movie-details/:id', (req, res)=> {
+    const id = req.params.id;
+    Movie.findByIdAndDelete(id , (err, movie)=> {
+        res.sendStatus(202);
+    });
+})
+
 
 ///////////////////////////////////////
 ///     Listen Port a mettre

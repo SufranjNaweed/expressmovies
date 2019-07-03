@@ -1,8 +1,43 @@
 <% include ./partials/head %>
 
-    <h1>MOVIES DETAILS : <%= movieId %></h1>
-    <div class="central">
 
+    <div class="central">
+        <h1>MOVIES DETAILS : <%= movie._id %></h1>
+        
+
+        <div>
+            <form  action="/movie-details/<%= movie._id  %>" method="post">
+
+                <legend>Modifier le film</legend>
+                <label for="movietitle" >Titre du film</label>
+                <input type="text" name="movietitle" id="movietitle" value="<%= movie.movietitle %>">
+                <label for="movieyear" >Année du film</label>
+                <input type="text" name="movieyear" id="movietitle" value="<%= movie.movieyear %>">
+
+                <button type="submit">Modifier</button>
+                
+            </form>
+            <button id="btnDelete">Suppression</button>
+        </div>
     </div>
+
+
+    <script>
+        var btnDelete = document.getElementById('btnDelete');
+        btnDelete.addEventListener('click', deleteDocument);
+
+        function deleteDocument(){
+            var movieId = <%- JSON.stringify(movie._id) %>;
+            var url =  '/movie-details/' + movieId;
+           
+            axios.delete(url)
+            .then(function(response){
+                window.location = '/movies';
+            })
+            .catch(function(error){
+                console.log(error)
+            });
+        }
+    </script>
 
 <% include ./partials/footer %>
