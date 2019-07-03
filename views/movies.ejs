@@ -9,7 +9,9 @@
         <div class="movies">
             <% for(movie of movies) { %>
                 <div>
-                    <h3><%= movie.movietitle %> (<%=  movie.movieyear %>)</h3>
+                    <a href="/movie-details/<%= movie._id %>">
+                        <h3><%= movie.movietitle %> (<%=  movie.movieyear %>)</h3>
+                    </a>
                 </div>
             <% } %>
         </div>
